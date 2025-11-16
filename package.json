@@ -1,0 +1,32 @@
+{
+  "name": "stock-ai",
+  "version": "1.0.0",
+  "description": "HTML 转 Windows 安装包",
+  "main": "main.js",
+  "author": "Joseph PAI",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.pai11joseph.twstock",
+    "productName": "台灣股票AI計算器",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>台灣股票計算器 (修正版)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .disclaimer {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .disclaimer ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .disclaimer li {
+            margin-bottom: 5px;
+        }
+
+        .section-note {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row > * {
+            flex: 1;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background-color: #95a5a6;
+        }
+
+        button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        button.success {
+            background-color: #27ae60;
+        }
+
+        button.success:hover {
+            background-color: #229954;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .notice {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 8px;
+            padding: 8px;
+            background-color: #e8f4f8;
+            border-radius: 4px;
+        }
+
+        .results {
+            display: none;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results p {
+            margin-bottom: 10px;
+        }
+
+        .results strong {
+            color: #2c3e50;
+        }
+
+        .recommendation.buy {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .recommendation.sell {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .recommendation.hold {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .rsi-value.oversold {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .rsi-value.overbought {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .rsi-value.neutral {
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .alert-box {
+            background-color: #fee;
+            border: 1px solid #c0392b;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #c0392b;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>台灣股票計算器 V8</h1>
+        
+        <div class="section-note">
+            此工具整合股票選擇與智能分析功能，使用 FinMind API 自動獲取歷史收盤價資料。
+        </div>
+
+        <form id="stockForm">
+            <!-- 第一部分：股票選擇 -->
+            <h2>一、選擇股票</h2>
+            
+            <div class="form-group">
+                <label>類股（產業別）</label>
+                <select id="industry">
+                    <option value="">載入中...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>股票名稱</label>
+                <select id="stockSelect">
+                    <option value="">請先選擇類股</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="stockCode">股票代碼</label>
+                <input type="text" id="stockCode" name="stockCode" placeholder="選擇股票名稱後自動帶入，或手動輸入代碼" required>
+            </div>
+
+            <!-- 第二部分：價格資料 -->
+            <h2>二、價格資料</h2>
+
+            <div class="form-group">
+                <label for="buyPrice">買入價格</label>
+                <input type="number" id="buyPrice" name="buyPrice" step="0.01" placeholder="例如：130.00（若未買入請留空）">
+                <p class="note">說明：請輸入您買入或實際預買入的價格，用於計算止損價和最佳賣出價。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="currentPrice">當前價格</label>
+                <input type="number" id="currentPrice" name="currentPrice" step="0.01" placeholder="例如：150.00" required>
+            </div>
+
+            <!-- 第三部分：歷史資料抓取 -->
+            <h2>三、歷史資料抓取</h2>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="startDate">開始日期（含）</label>
+                    <input id="startDate" type="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">結束日期（含）</label>
+                    <input id="endDate" type="date" required>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="fetchBtn">抓取歷史收盤價</button>
+                <button type="button" id="clearFetchBtn" class="secondary">清除</button>
+            </div>
+
+            <div class="notice" id="fetchNote"></div>
+
+            <div class="form-group">
+                <label for="historicalPrices">歷史收盤價（以逗號分隔）</label>
+                <textarea id="historicalPrices" name="historicalPrices" placeholder="點擊「抓取歷史收盤價」自動填入，或手動輸入，例如：100,102,105,98,110" required></textarea>
+                <p class="note">說明：歷史收盤價按時間順序，用逗號分隔。<strong>建議至少 30 天以提供較高準確性</strong>（最少需 14 天計算 RSI）。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="historicalDays">歷史數據期間（天）</label>
+                <input type="number" id="historicalDays" name="historicalDays" placeholder="自動計算" readonly>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="historicalLow">歷史最低價</label>
+                    <input type="number" id="historicalLow" name="historicalLow" step="0.01" placeholder="自動計算" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="historicalHigh">歷史最高價</label>
+                    <input type="number" id="historicalHigh" name="historicalHigh" step="0.01" placeholder="自動計算" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="historicalAvg">歷史平均價</label>
+                <input type="number" id="historicalAvg" name="historicalAvg" step="0.01" placeholder="自動計算" readonly>
+            </div>
+
+            <!-- 第四部分：交易參數設定 -->
+            <h2>四、交易參數設定</h2>
+
+            <div class="form-group">
+                <label for="stopLoss">止損百分比（%）</label>
+                <input type="number" id="stopLoss" name="stopLoss" step="0.1" placeholder="例如：5" min="3" max="15" value="5">
+                <p class="note">說明：建議設定為 3-15%，根據個人風險承受能力調整。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="profitTarget">盈利目標百分比（%）</label>
+                <input type="number" id="profitTarget" name="profitTarget" step="0.1" placeholder="例如：10" min="5" max="50" value="10">
+                <p class="note">說明：建議設定為 5-50%，根據市場波動性調整。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="transactionCost">交易成本百分比（%）</label>
+                <input type="number" id="transactionCost" name="transactionCost" step="0.01" placeholder="例如：0.5" min="0.3" max="1" value="0.5">
+                <p class="note">說明：台灣股市交易成本約 0.3-0.6%（含手續費與證交稅）。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="slippage">滑點百分比（%）</label>
+                <input type="number" id="slippage" name="slippage" step="0.01" placeholder="例如：0.2" min="0" max="1" value="0.2">
+                <p class="note">說明：實際成交價與預期價格的偏差，建議 0.1-0.5%。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="leverage">槓桿倍數</label>
+                <input type="number" id="leverage" name="leverage" step="0.1" placeholder="例如：1（無槓桿）" min="1" max="3" value="1">
+                <p class="note">說明：1 表示無槓桿，台股融資最高約 2.5 倍。<strong>槓桿增加風險，請謹慎使用</strong>。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="marketTrend">市場趨勢調整（%）</label>
+                <input type="number" id="marketTrend" name="marketTrend" step="0.1" placeholder="例如：10（牛市），-10（熊市）" min="-30" max="30" value="0">
+                <p class="note">說明：根據大盤走勢調整（如加權指數），正數為牛市，負數為熊市。建議範圍 -30% 到 +30%。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="expectedWinRate">預期勝率（%）</label>
+                <input type="number" id="expectedWinRate" name="expectedWinRate" step="1" placeholder="例如：50（可選）" min="20" max="80">
+                <p class="note">說明：<strong>選填</strong>。如果您有實際回測數據，可輸入預期勝率。留空則由系統根據技術指標推估（但推估值可能不準確）。</p>
+            </div>
+
+            <div class="form-group">
+                <label for="volatility">波動率（%）</label>
+                <input type="number" id="volatility" name="volatility" step="0.01" placeholder="自動計算" readonly>
+                <p class="note">說明：根據歷史收盤價自動計算年化波動率。</p>
+            </div>
+
+            <div class="form-group">
+                <button type="submit">計算分析結果</button>
+            </div>
+        </form>
+
+        <div id="results" class="results">
+            <h2>計算結果</h2>
+            <p><strong>股票代碼：</strong> <span id="resultStockCode"></span></p>
+            <p><strong>實際買入價格：</strong> <span id="actualBuyPrice"></span></p>
+            
+            <div id="dataWarning" style="display: none;" class="alert-box"></div>
+            
+            <p><strong>綜合評分：</strong> <span id="scoreValue"></span></p>
+            <p><strong>推薦：</strong> <span id="recommendation" class="recommendation"></span></p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px;">技術指標</h3>
+            <p id="rsiWarning" style="display: none;" class="warning">警告：歷史資料不足 14 天，RSI 計算可能不準確！</p>
+            <p><strong>RSI（相對強弱指數）：</strong> <span id="rsiValue" class="rsi-value"></span></p>
+            <div class="section-note" style="margin-top: 5px; margin-bottom: 15px;">
+                <strong>RSI 指標說明：</strong><br>
+                • RSI < 30（超賣）：股價可能被低估，適合逢低買進<br>
+                • RSI 30-40（偏超賣）：股價相對偏低，可留意反彈機會<br>
+                • RSI 40-60（中性）：市場多空力量相對均衡<br>
+                • RSI 60-70（偏超買）：股價相對偏高，注意回調風險<br>
+                • RSI > 70（超買）：股價可能過高，謹慎追高或考慮賣出
+            </div>
+            
+            <p id="macdInfo" style="display: none;"><strong>MACD 信號：</strong> <span id="macdSignal"></span></p>
+            <div class="section-note" style="margin-top: 5px; margin-bottom: 15px;" id="macdNote">
+                <strong>MACD 指標說明：</strong><br>
+                • 黃金交叉：短期趨勢由弱轉強，形成買入信號，建議結合其他指標確認<br>
+                • 死亡交叉：短期趨勢由強轉弱，形成賣出信號，建議考慮減倉或停損<br>
+                • 多頭格局（MACD > Signal）：短期趨勢向上，可持續持有或逢低加碼<br>
+                • 空頭格局（MACD < Signal）：短期趨勢向下，建議觀望或等待趨勢反轉<br>
+                • 中性：趨勢不明確，建議等待更清晰的信號
+            </div>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px;">價格建議</h3>
+            <p><strong>建議買入價格：</strong> <span id="suggestedBuyPrice"></span></p>
+            <p><strong>止損賣出價格：</strong> <span id="stopLossPrice"></span></p>
+            <p><strong>盈利目標賣出價格：</strong> <span id="profitTargetPrice"></span></p>
+            <p id="optimalSellPrice" style="display: none;">
+                <strong>未來最佳賣出價格建議：</strong> <span id="optimalSellPriceValue"></span>
+            </p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px;">風險管理參數</h3>
+            <p><strong>凱利投資比例：</strong> <span id="kellyRatio"></span></p>
+            <p><strong>調整後勝率：</strong> <span id="adjustedWinRate"></span></p>
+            <p><strong>調整後賠率：</strong> <span id="adjustedOdds"></span></p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px;">波動率分析</h3>
+            <p><strong>日波動率：</strong> <span id="dailyVolatility"></span></p>
+            <p><strong>周波動率：</strong> <span id="weeklyVolatility"></span></p>
+            <p><strong>月波動率：</strong> <span id="monthlyVolatility"></span></p>
+            <p><strong>年波動率：</strong> <span id="annualVolatility"></span></p>
+            
+            <div class="disclaimer" style="margin-top: 30px;">
+                <h3>⚠️ 重要風險警示與免責聲明</h3>
+                <ul>
+                    <li><strong>本工具僅供參考，不構成投資建議</strong></li>
+                    <li>勝率計算基於技術指標推估，<strong>非實際回測結果</strong>，實際勝率可能大幅不同</li>
+                    <li>凱利比例為理論值，實際交易應根據個人風險承受能力<strong>大幅降低投資比例</strong></li>
+                    <li>技術分析有其局限性，應結合基本面、市場環境與資金管理</li>
+                    <li>過去表現不代表未來結果，投資有風險，請謹慎評估</li>
+                    <li>建議：實際投資金額不應超過凱利比例的 <strong>1/4 到 1/2</strong></li>
+                </ul>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666;">
+                    © 2025 慧達科技股份有限公司 版權所有
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全域變數
+        let stockData = [];
+        let industries = new Set();
+
+        // 工具函數
+        function formatDate(d) {
+            const y = d.getFullYear();
+            const m = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function datesBetween(start, end) {
+            const arr = [];
+            const cur = new Date(start);
+            cur.setHours(0, 0, 0, 0);
+            while (cur <= end) {
+                arr.push(formatDate(new Date(cur)));
+                cur.setDate(cur.getDate() + 1);
+            }
+            return arr;
+        }
+
+        // 載入股票列表
+        async function loadStockList() {
+            const fetchNote = document.getElementById('fetchNote');
+            const industryEl = document.getElementById('industry');
+            
+            try {
+                fetchNote.textContent = '正在載入股票列表...';
+                
+                const url = 'https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo';
+                const res = await fetch(url);
+                
+                if (!res.ok) throw new Error('無法載入股票列表');
+                
+                const json = await res.json();
+                
+                if (json.status === 200 && Array.isArray(json.data)) {
+                    stockData = json.data
+                        .filter(item => item.type === 'twse' || item.type === 'tpex')
+                        .sort((a, b) => a.stock_id.localeCompare(b.stock_id));
+                    
+                    industries = new Set(stockData.map(item => item.industry_category).filter(Boolean));
+                    
+                    industryEl.innerHTML = '<option value="">-- 請選擇類股 --</option>';
+                    Array.from(industries).sort().forEach(industry => {
+                        const option = document.createElement('option');
+                        option.value = industry;
+                        option.textContent = industry;
+                        industryEl.appendChild(option);
+                    });
+                    
+                    fetchNote.textContent = `已載入 ${stockData.length} 支股票資料`;
+                } else {
+                    throw new Error('股票列表格式異常');
+                }
+            } catch (e) {
+                console.error('載入股票列表錯誤', e);
+                fetchNote.textContent = '載入股票列表失敗：' + (e.message || e);
+                industryEl.innerHTML = '<option value="">載入失敗</option>';
+            }
+        }
+
+        // 類股變更事件
+        document.getElementById('industry').addEventListener('change', (e) => {
+            const selectedIndustry = e.target.value;
+            const stockSelectEl = document.getElementById('stockSelect');
+            
+            if (!selectedIndustry) {
+                stockSelectEl.innerHTML = '<option value="">請先選擇類股</option>';
+                return;
+            }
+            
+            const filteredStocks = stockData.filter(item => item.industry_category === selectedIndustry);
+            
+            stockSelectEl.innerHTML = '<option value="">-- 請選擇股票 --</option>';
+            filteredStocks.forEach(stock => {
+                const option = document.createElement('option');
+                option.value = stock.stock_id;
+                option.textContent = `${stock.stock_id} ${stock.stock_name}`;
+                stockSelectEl.appendChild(option);
+            });
+        });
+
+        // 股票選擇事件
+        document.getElementById('stockSelect').addEventListener('change', (e) => {
+            const stockId = e.target.value;
+            document.getElementById('stockCode').value = stockId;
+        });
+
+        // 抓取歷史收盤價
+        async function fetchFinMind(stockNo, start, end) {
+            const results = {};
+            
+            const startDateParam = formatDate(start);
+            const endDateParam = formatDate(end);
+            
+            const url = `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${stockNo}&start_date=${startDateParam}&end_date=${endDateParam}`;
+            
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('FinMind 回傳非 200');
+            const json = await res.json();
+            
+            if (json.status === 200 && Array.isArray(json.data)) {
+                if (json.data.length === 0) {
+                    throw new Error('查無此股票代碼或日期範圍內無資料');
+                }
+                json.data.forEach(row => {
+                    const date = row.date;
+                    const close = row.close === null || row.close === undefined ? '' : String(row.close).replace(/,/g, '').trim();
+                    results[date] = close === '-' ? '' : close;
+                });
+            } else if (json.status === 404) {
+                throw new Error('查無此股票代碼或日期範圍內無資料');
+            } else {
+                throw new Error('FinMind API 返回異常格式');
+            }
+            
+            return results;
+        }
+
+        // 抓取按鈕事件
+        document.getElementById('fetchBtn').addEventListener('click', async () => {
+            const stockNo = document.getElementById('stockCode').value.trim();
+            const startRaw = document.getElementById('startDate').value;
+            const endRaw = document.getElementById('endDate').value;
+            const fetchNote = document.getElementById('fetchNote');
+            const historicalPricesEl = document.getElementById('historicalPrices');
+            
+            if (!stockNo) {
+                alert('請輸入股票代碼');
+                return;
+            }
+            if (!startRaw || !endRaw) {
+                alert('請選擇開始與結束日期');
+                return;
+            }
+            
+            const start = new Date(startRaw);
+            const end = new Date(endRaw);
+            
+            if (start > end) {
+                alert('開始日期不可晚於結束日期');
+                return;
+            }
+
+            fetchNote.textContent = '開始抓取資料...';
+            
+            try {
+                const map = await fetchFinMind(stockNo, start, end);
+                
+                const allDates = datesBetween(start, end);
+                const values = allDates
+                    .map(d => map[d])
+                    .filter(v => v !== undefined && v !== '');
+                
+                historicalPricesEl.value = values.join(',');
+                
+                // 自動計算相關欄位
+                if (values.length > 0) {
+                    const prices = values.map(v => parseFloat(v));
+                    document.getElementById('historicalDays').value = prices.length;
+                    document.getElementById('historicalLow').value = Math.min(...prices).toFixed(2);
+                    document.getElementById('historicalHigh').value = Math.max(...prices).toFixed(2);
+                    const avg = prices.reduce((sum, p) => sum + p, 0) / prices.length;
+                    document.getElementById('historicalAvg').value = avg.toFixed(2);
+                    
+                    // 自動填入當前價格（使用最後一個收盤價）
+                    const latestPrice = prices[prices.length - 1];
+                    document.getElementById('currentPrice').value = latestPrice.toFixed(2);
+                }
+                
+                fetchNote.textContent = `共 ${allDates.length} 日，找到 ${values.length} 個交易日的收盤價。`;
+            } catch (e) {
+                console.error(e);
+                fetchNote.textContent = '發生錯誤：' + (e.message || e);
+                alert('抓取發生錯誤：' + (e.message || e));
+            }
+        });
+
+        // 清除抓取按鈕
+        document.getElementById('clearFetchBtn').addEventListener('click', () => {
+            document.getElementById('historicalPrices').value = '';
+            document.getElementById('historicalDays').value = '';
+            document.getElementById('historicalLow').value = '';
+            document.getElementById('historicalHigh').value = '';
+            document.getElementById('historicalAvg').value = '';
+            document.getElementById('fetchNote').textContent = '';
+        });
+
+        // 表單提交事件
+        document.getElementById('stockForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const stockCode = document.getElementById('stockCode').value.trim();
+            const buyPriceInput = document.getElementById('buyPrice').value.trim();
+            const buyPrice = buyPriceInput ? parseFloat(buyPriceInput) : null;
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const historicalDays = parseInt(document.getElementById('historicalDays').value);
+            const historicalPricesInput = document.getElementById('historicalPrices').value.trim();
+            const historicalPrices = historicalPricesInput.split(',').map(item => parseFloat(item.trim())).filter(num => !isNaN(num));
+            const stopLossPercent = parseFloat(document.getElementById('stopLoss').value) / 100 || 0.05;
+            const profitTargetPercent = parseFloat(document.getElementById('profitTarget').value) / 100 || 0.10;
+            const transactionCost = parseFloat(document.getElementById('transactionCost').value) / 100 || 0.005;
+            const slippage = parseFloat(document.getElementById('slippage').value) / 100 || 0.002;
+            const leverage = parseFloat(document.getElementById('leverage').value) || 1;
+            const marketTrend = parseFloat(document.getElementById('marketTrend').value) / 100 || 0;
+            const expectedWinRateInput = document.getElementById('expectedWinRate').value.trim();
+            const userProvidedWinRate = expectedWinRateInput ? parseFloat(expectedWinRateInput) / 100 : null;
+
+            if (historicalPrices.length === 0) {
+                alert('請先抓取或輸入歷史收盤價');
+                return;
+            }
+
+            // 數據充足性檢查
+            const dataWarningEl = document.getElementById('dataWarning');
+            let dataWarnings = [];
+            
+            if (historicalPrices.length < 14) {
+                dataWarnings.push('歷史數據少於 14 天，RSI 計算將不準確');
+            } else if (historicalPrices.length < 30) {
+                dataWarnings.push('建議使用至少 30 天數據以提高分析準確性');
+            }
+            
+            if (historicalPrices.length < 26) {
+                dataWarnings.push('歷史數據少於 26 天，無法計算 MACD 指標');
+            }
+            
+            if (dataWarnings.length > 0) {
+                dataWarningEl.textContent = '⚠️ 數據警告：' + dataWarnings.join('；');
+                dataWarningEl.style.display = 'block';
+            } else {
+                dataWarningEl.style.display = 'none';
+            }
+
+            // 計算歷史平均價
+            const historicalAvg = historicalPrices.reduce((sum, price) => sum + price, 0) / historicalPrices.length;
+            document.getElementById('historicalAvg').value = historicalAvg.toFixed(2);
+
+            const historicalLow = Math.min(...historicalPrices);
+            const historicalHigh = Math.max(...historicalPrices);
+
+            // 計算 RSI（需要至少 14 天數據）
+            let rsi = 50; // 預設中性值
+            let rsiCalculated = false;
+            
+            if (historicalPrices.length >= 14) {
+                const rsiPeriod = 14;
+                let gains = [], losses = [];
+                for (let i = 1; i < historicalPrices.length; i++) {
+                    const priceChange = historicalPrices[i] - historicalPrices[i - 1];
+                    gains.push(priceChange > 0 ? priceChange : 0);
+                    losses.push(priceChange < 0 ? Math.abs(priceChange) : 0);
+                }
+
+                let avgGain = gains.slice(0, rsiPeriod).reduce((sum, val) => sum + val, 0) / rsiPeriod || 0;
+                let avgLoss = losses.slice(0, rsiPeriod).reduce((sum, val) => sum + val, 0) / rsiPeriod || 0;
+                const smoothingFactor = 2 / (rsiPeriod + 1);
+
+                for (let i = rsiPeriod; i < gains.length; i++) {
+                    avgGain = (gains[i] * smoothingFactor) + (avgGain * (1 - smoothingFactor));
+                    avgLoss = (losses[i] * smoothingFactor) + (avgLoss * (1 - smoothingFactor));
+                }
+
+                const rs = avgLoss === 0 ? Infinity : avgGain / avgLoss;
+                rsi = rs === Infinity ? 100 : 100 - (100 / (1 + rs));
+                rsiCalculated = true;
+            }
+
+            // RSI 警告
+            const rsiWarning = document.getElementById('rsiWarning');
+            if (historicalPrices.length < 14) {
+                rsiWarning.style.display = 'block';
+            } else {
+                rsiWarning.style.display = 'none';
+            }
+
+            // 計算 MACD
+            function calculateEMA(prices, period) {
+                const k = 2 / (period + 1);
+                let ema = prices[0];
+                const emaValues = [ema];
+                for (let i = 1; i < prices.length; i++) {
+                    ema = prices[i] * k + ema * (1 - k);
+                    emaValues.push(ema);
+                }
+                return emaValues;
+            }
+
+            let macdSignal = 'neutral';
+            let macdValue = 0;
+            let macdSignalLine = 0;
+            let macdHistogram = 0;
+            let macdCalculated = false;
+
+            if (historicalPrices.length >= 26) {
+                const ema12 = calculateEMA(historicalPrices, 12);
+                const ema26 = calculateEMA(historicalPrices, 26);
+                const macdLine = ema12.map((val, idx) => val - ema26[idx]);
+                const signalLine = calculateEMA(macdLine, 9);
+                
+                macdValue = macdLine[macdLine.length - 1];
+                macdSignalLine = signalLine[signalLine.length - 1];
+                macdHistogram = macdValue - macdSignalLine;
+                macdCalculated = true;
+
+                // MACD 信號判斷（加入趨勢確認）
+                const prevHistogram = macdLine[macdLine.length - 2] - signalLine[signalLine.length - 2];
+                
+                if (macdHistogram > 0 && prevHistogram <= 0) {
+                    macdSignal = 'golden_cross';
+                } else if (macdHistogram < 0 && prevHistogram >= 0) {
+                    macdSignal = 'death_cross';
+                } else if (macdHistogram > 0) {
+                    macdSignal = 'bullish';
+                } else if (macdHistogram < 0) {
+                    macdSignal = 'bearish';
+                }
+            }
+
+            // 計算波動率
+            const returns = [];
+            for (let i = 1; i < historicalPrices.length; i++) {
+                returns.push(historicalPrices[i] / historicalPrices[i - 1] - 1);
+            }
+            const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length || 0;
+            const variance = returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / (returns.length - 1) || 0;
+            const dailyVolatility = Math.sqrt(variance) * 100;
+            const weeklyVolatility = dailyVolatility * Math.sqrt(5);
+            const monthlyVolatility = dailyVolatility * Math.sqrt(21);
+            const annualVolatility = dailyVolatility * Math.sqrt(252);
+
+            document.getElementById('volatility').value = annualVolatility.toFixed(2);
+
+            // 凱利公式計算
+            // 1. 計算勝率 (p)
+            let adjustedP;
+            
+            if (userProvidedWinRate !== null) {
+                // 使用者提供勝率
+                adjustedP = Math.max(0.2, Math.min(0.8, userProvidedWinRate));
+            } else {
+                // 使用技術指標推估（注意：這只是推估，非實際回測結果）
+                const priceRange = historicalHigh - historicalLow;
+                const pricePosition = priceRange > 0 ? (currentPrice - historicalLow) / priceRange : 0.5;
+                
+                // 基礎勝率：價格越接近低點，基礎分稍高
+                let baseP = 0.45 + (0.5 - pricePosition) * 0.15; // 在低點附近時約0.53，高點附近時約0.38
+                
+                // RSI 調整（如果計算出來了）
+                if (rsiCalculated) {
+                    if (rsi < 30) {
+                        baseP += 0.10;
+                    } else if (rsi > 70) {
+                        baseP -= 0.10;
+                    } else {
+                        baseP += (50 - rsi) / 400; // RSI偏離50的程度影響勝率
+                    }
+                }
+                
+                // 市場趨勢調整
+                baseP += marketTrend * 0.3;
+                
+                // 波動率調整：高波動率降低勝率
+                baseP -= (annualVolatility / 100) * 0.08;
+                
+                // MACD 調整
+                if (macdCalculated) {
+                    if (macdSignal === 'golden_cross') {
+                        baseP += 0.08;
+                    } else if (macdSignal === 'death_cross') {
+                        baseP -= 0.08;
+                    }
+                }
+                
+                // 限制勝率在合理範圍內 (0.2 - 0.8)
+                adjustedP = Math.max(0.2, Math.min(0.8, baseP));
+            }
+            
+            const q = 1 - adjustedP;
+
+            // 2. 計算賠率 (b)：盈利目標 / 止損幅度（扣除交易成本和滑點）
+            const totalCost = transactionCost + slippage;
+            const profitAfterCost = (profitTargetPercent * leverage) - (totalCost * 2);
+            const lossAfterCost = (stopLossPercent * leverage) + (totalCost * 2);
+            const b = profitAfterCost / lossAfterCost;
+
+            // 3. 凱利公式：f = (bp - q) / b
+            const kellyRatio = (b * adjustedP - q) / b;
+            
+            // 4. 調整凱利比例（保守起見，建議使用 1/4 到 1/2 凱利）
+            const adjustedKelly = Math.max(0, Math.min(1, kellyRatio));
+            
+            // 凱利公式計算式
+            const kellyFormula = `f = (b×p - q) / b = (${b.toFixed(2)}×${adjustedP.toFixed(2)} - ${q.toFixed(2)}) / ${b.toFixed(2)} = ${kellyRatio.toFixed(4)}`;
+
+            // 評分系統（0-100分）
+            let score = 0;
+            let scoreReasons = [];
+            
+            // RSI 評分（20分）
+            if (rsiCalculated) {
+                if (rsi < 30) {
+                    score += 20;
+                    scoreReasons.push('RSI 超賣(+20)');
+                } else if (rsi > 70) {
+                    score += 0;
+                    scoreReasons.push('RSI 超買(+0)');
+                } else if (rsi >= 40 && rsi <= 60) {
+                    score += 10;
+                    scoreReasons.push('RSI 中性(+10)');
+                } else if (rsi < 40) {
+                    score += 15;
+                    scoreReasons.push('RSI 偏低(+15)');
+                } else {
+                    score += 5;
+                    scoreReasons.push('RSI 偏高(+5)');
+                }
+            } else {
+                score += 10;
+                scoreReasons.push('RSI 無法計算(+10 預設)');
+            }
+            
+            // MACD 評分（20分）
+            if (macdCalculated) {
+                if (macdSignal === 'golden_cross') {
+                    score += 20;
+                    scoreReasons.push('MACD 黃金交叉(+20)');
+                } else if (macdSignal === 'death_cross') {
+                    score += 0;
+                    scoreReasons.push('MACD 死亡交叉(+0)');
+                } else if (macdSignal === 'bullish') {
+                    score += 15;
+                    scoreReasons.push('MACD 多頭(+15)');
+                } else if (macdSignal === 'bearish') {
+                    score += 5;
+                    scoreReasons.push('MACD 空頭(+5)');
+                } else {
+                    score += 10;
+                    scoreReasons.push('MACD 中性(+10)');
+                }
+            } else {
+                score += 10;
+                scoreReasons.push('MACD 無法計算(+10 預設)');
+            }
+            
+            // 價格位置評分（20分）
+            const priceRange = historicalHigh - historicalLow;
+            const pricePosition = priceRange > 0 ? (currentPrice - historicalLow) / priceRange : 0.5;
+            const priceScore = Math.round((1 - pricePosition) * 20);
+            score += priceScore;
+            scoreReasons.push(`價格位置(+${priceScore})`);
+            
+            // 凱利比例評分（20分）
+            if (adjustedKelly > 0.5) {
+                score += 20;
+                scoreReasons.push('凱利比例優異(+20)');
+            } else if (adjustedKelly > 0.25) {
+                score += 15;
+                scoreReasons.push('凱利比例良好(+15)');
+            } else if (adjustedKelly > 0.15) {
+                score += 10;
+                scoreReasons.push('凱利比例適中(+10)');
+            } else if (adjustedKelly > 0.05) {
+                score += 5;
+                scoreReasons.push('凱利比例偏低(+5)');
+            } else {
+                score += 0;
+                scoreReasons.push('凱利比例極低(+0)');
+            }
+            
+            // 市場趨勢評分（10分）
+            if (marketTrend > 0.1) {
+                score += 10;
+                scoreReasons.push('強勢牛市(+10)');
+            } else if (marketTrend > 0) {
+                score += 7;
+                scoreReasons.push('溫和牛市(+7)');
+            } else if (marketTrend > -0.1) {
+                score += 5;
+                scoreReasons.push('市場中性(+5)');
+            } else {
+                score += 2;
+                scoreReasons.push('熊市環境(+2)');
+            }
+            
+            // 波動率評分（10分）
+            if (annualVolatility < 20) {
+                score += 10;
+                scoreReasons.push('波動率低(+10)');
+            } else if (annualVolatility < 40) {
+                score += 7;
+                scoreReasons.push('波動率適中(+7)');
+            } else if (annualVolatility < 60) {
+                score += 4;
+                scoreReasons.push('波動率較高(+4)');
+            } else {
+                score += 2;
+                scoreReasons.push('波動率極高(+2)');
+            }
+
+            // 建議買入價格（修正安全邊際邏輯）
+            let safetyMargin = marketTrend > 0 ? 0.10 : 0.05; // 牛市更謹慎，需要更大安全邊際
+            
+            if (rsiCalculated) {
+                if (rsi < 30) {
+                    safetyMargin *= 0.6; // RSI 超賣時降低安全邊際要求
+                } else if (rsi > 70) {
+                    safetyMargin *= 1.8; // RSI 超買時提高安全邊際要求
+                }
+            }
+            
+            const suggestedBuyPrice = currentPrice * (1 - safetyMargin);
+
+            // 止損價格：基於實際買入價或建議買入價計算
+            let stopLossPrice;
+            let stopLossBasePrice;
+            if (buyPrice !== null) {
+                stopLossBasePrice = buyPrice;
+                stopLossPrice = buyPrice * (1 - stopLossPercent);
+            } else {
+                stopLossBasePrice = suggestedBuyPrice;
+                stopLossPrice = suggestedBuyPrice * (1 - stopLossPercent);
+            }
+            
+            // 盈利目標價格：基於實際買入價或當前價計算
+            let profitTargetPrice;
+            if (buyPrice !== null) {
+                profitTargetPrice = buyPrice * (1 + profitTargetPercent);
+            } else {
+                profitTargetPrice = currentPrice * (1 + profitTargetPercent);
+            }
+
+            // 最佳賣出價格
+            let optimalSellPrice = null;
+            if (buyPrice !== null && buyPrice > 0) {
+                let marketTrendAdjustment = marketTrend;
+                const bearishAdjustment = marketTrend < 0 ? Math.abs(marketTrend) * 0.5 : 0;
+                let rsiAdjustment = 0;
+                if (rsiCalculated) {
+                    if (rsi > 70) {
+                        rsiAdjustment = -0.05;
+                    } else if (rsi < 30) {
+                        rsiAdjustment = 0.05;
+                    }
+                }
+                const optimalProfitTarget = profitTargetPercent + marketTrendAdjustment - bearishAdjustment + rsiAdjustment;
+                const volatilityAdjustment = annualVolatility / 100 * 0.01;
+                optimalSellPrice = buyPrice * (1 + Math.max(0, optimalProfitTarget) + volatilityAdjustment);
+                optimalSellPrice = Math.max(optimalSellPrice, buyPrice);
+            }
+
+            // 推薦邏輯（基於評分系統）
+            let recommendation = '';
+            let recommendationClass = '';
+            let recommendationReason = '';
+            
+            if (score >= 80) {
+                recommendation = '強烈建議買入';
+                recommendationClass = 'buy';
+                recommendationReason = `（綜合評分 ${score} 分，多項指標呈現強烈買入信號）`;
+            } else if (score >= 65) {
+                recommendation = '建議買入';
+                recommendationClass = 'buy';
+                recommendationReason = `（綜合評分 ${score} 分，整體條件良好）`;
+            } else if (score >= 50) {
+                recommendation = '可考慮買入';
+                recommendationClass = 'buy';
+                recommendationReason = `（綜合評分 ${score} 分，條件尚可，建議小額試單）`;
+            } else if (score >= 35) {
+                recommendation = '持倉觀望';
+                recommendationClass = 'hold';
+                recommendationReason = `（綜合評分 ${score} 分，建議等待更好時機）`;
+            } else if (score >= 20) {
+                recommendation = '建議觀望';
+                recommendationClass = 'hold';
+                recommendationReason = `（綜合評分 ${score} 分，當前不是好的進場時機）`;
+            } else {
+                recommendation = '建議賣出或觀望';
+                recommendationClass = 'sell';
+                recommendationReason = `（綜合評分 ${score} 分，多項指標呈現賣出信號）`;
+            }
+            
+            // 特殊情況覆蓋
+            if (adjustedKelly <= 0) {
+                recommendation = '不建議投資';
+                recommendationClass = 'sell';
+                recommendationReason = '（凱利比例為負，期望報酬為負）';
+            } else if (currentPrice >= historicalHigh * 0.98) {
+                recommendation = '建議等待回調';
+                recommendationClass = 'hold';
+                recommendationReason = '（當前價格接近歷史高位）';
+            }
+
+            // 顯示結果
+            document.getElementById('resultStockCode').textContent = stockCode;
+            document.getElementById('actualBuyPrice').textContent = buyPrice !== null ? buyPrice.toFixed(2) : '未填寫';
+            
+            document.getElementById('scoreValue').textContent = `${score} / 100 分 (${scoreReasons.join(', ')})`;
+            
+            const recommendationElement = document.getElementById('recommendation');
+            recommendationElement.textContent = `${recommendation} ${recommendationReason}`;
+            recommendationElement.className = 'recommendation ' + recommendationClass;
+
+            const rsiElement = document.getElementById('rsiValue');
+            if (rsiCalculated) {
+                let rsiAdvice = '';
+                if (rsi < 30) {
+                    rsiAdvice = ' - 📊 處於超賣區，股價可能被低估，可考慮逢低買進';
+                    rsiElement.className = 'rsi-value oversold';
+                } else if (rsi > 70) {
+                    rsiAdvice = ' - ⚠️ 處於超買區，股價可能過高，建議謹慎追高或考慮賣出';
+                    rsiElement.className = 'rsi-value overbought';
+                } else if (rsi >= 40 && rsi <= 60) {
+                    rsiAdvice = ' - ✓ 處於中性區間，市場多空力量相對均衡';
+                    rsiElement.className = 'rsi-value neutral';
+                } else if (rsi < 40) {
+                    rsiAdvice = ' - 📈 偏向超賣，股價相對偏低，可留意反彈機會';
+                    rsiElement.className = 'rsi-value neutral';
+                } else {
+                    rsiAdvice = ' - 📉 偏向超買，股價相對偏高，建議注意回調風險';
+                    rsiElement.className = 'rsi-value neutral';
+                }
+                rsiElement.textContent = rsi.toFixed(2) + rsiAdvice;
+            } else {
+                rsiElement.textContent = '數據不足，無法計算';
+                rsiElement.className = 'rsi-value';
+            }
+
+            // 顯示 MACD 信息
+            if (macdCalculated) {
+                const macdInfoEl = document.getElementById('macdInfo');
+                const macdSignalEl = document.getElementById('macdSignal');
+                const macdNoteEl = document.getElementById('macdNote');
+                macdInfoEl.style.display = 'block';
+                macdNoteEl.style.display = 'block';
+                
+                let macdText = '';
+                let macdClass = '';
+                let macdAdvice = '';
+                
+                if (macdSignal === 'golden_cross') {
+                    macdText = `黃金交叉（買入信號）MACD: ${macdValue.toFixed(2)}, Signal: ${macdSignalLine.toFixed(2)}, Histogram: ${macdHistogram.toFixed(2)}`;
+                    macdClass = 'buy';
+                    macdAdvice = ' - 🚀 短期趨勢由弱轉強，形成買入信號，但建議結合其他指標確認';
+                } else if (macdSignal === 'death_cross') {
+                    macdText = `死亡交叉（賣出信號）MACD: ${macdValue.toFixed(2)}, Signal: ${macdSignalLine.toFixed(2)}, Histogram: ${macdHistogram.toFixed(2)}`;
+                    macdClass = 'sell';
+                    macdAdvice = ' - 📉 短期趨勢由強轉弱，形成賣出信號，建議考慮減倉或停損';
+                } else if (macdSignal === 'bullish') {
+                    macdText = `多頭（MACD > Signal）MACD: ${macdValue.toFixed(2)}, Signal: ${macdSignalLine.toFixed(2)}, Histogram: ${macdHistogram.toFixed(2)}`;
+                    macdClass = 'buy';
+                    macdAdvice = ' - 📈 維持多頭格局，短期趨勢向上，可持續持有或逢低加碼';
+                } else if (macdSignal === 'bearish') {
+                    macdText = `空頭（MACD < Signal）MACD: ${macdValue.toFixed(2)}, Signal: ${macdSignalLine.toFixed(2)}, Histogram: ${macdHistogram.toFixed(2)}`;
+                    macdClass = 'sell';
+                    macdAdvice = ' - 📊 維持空頭格局，短期趨勢向下，建議觀望或等待趨勢反轉';
+                } else {
+                    macdText = `中性 MACD: ${macdValue.toFixed(2)}, Signal: ${macdSignalLine.toFixed(2)}, Histogram: ${macdHistogram.toFixed(2)}`;
+                    macdClass = 'hold';
+                    macdAdvice = ' - ⚖️ 趨勢不明確，建議等待更清晰的信號';
+                }
+                
+                macdSignalEl.textContent = macdText + macdAdvice;
+                macdSignalEl.className = 'recommendation ' + macdClass;
+            } else {
+                document.getElementById('macdInfo').style.display = 'none';
+                document.getElementById('macdNote').style.display = 'none';
+            }
+
+            const safetyMarginPercent = (safetyMargin * 100).toFixed(1);
+            document.getElementById('suggestedBuyPrice').textContent = `${suggestedBuyPrice.toFixed(2)} （基於當前價格 ${currentPrice.toFixed(2)} 下調 ${safetyMarginPercent}% 安全邊際）`;
+            
+            const stopLossPriceText = buyPrice !== null 
+                ? `${stopLossPrice.toFixed(2)} （基於買入價格 ${buyPrice.toFixed(2)} 下調 ${(stopLossPercent * 100).toFixed(1)}%）`
+                : `${stopLossPrice.toFixed(2)} （基於建議買入價格 ${suggestedBuyPrice.toFixed(2)} 下調 ${(stopLossPercent * 100).toFixed(1)}%）`;
+            document.getElementById('stopLossPrice').textContent = stopLossPriceText;
+            
+            const profitTargetPriceText = buyPrice !== null
+                ? `${profitTargetPrice.toFixed(2)} （基於買入價格 ${buyPrice.toFixed(2)} 上調 ${(profitTargetPercent * 100).toFixed(1)}%）`
+                : `${profitTargetPrice.toFixed(2)} （基於當前價格 ${currentPrice.toFixed(2)} 上調 ${(profitTargetPercent * 100).toFixed(1)}%）`;
+            document.getElementById('profitTargetPrice').textContent = profitTargetPriceText;
+
+            const optimalSellPriceElement = document.getElementById('optimalSellPrice');
+            const optimalSellPriceValueElement = document.getElementById('optimalSellPriceValue');
+            if (buyPrice !== null && optimalSellPrice !== null) {
+                optimalSellPriceValueElement.textContent = `${optimalSellPrice.toFixed(2)} （基於買入價格、市場趨勢、RSI 和波動率綜合計算）`;
+                optimalSellPriceElement.style.display = 'block';
+            } else {
+                optimalSellPriceElement.style.display = 'none';
+            }
+
+            // 凱利比例顯示
+            let kellyAdvice = '';
+            if (adjustedKelly <= 0) {
+                kellyAdvice = '❌ 建議：不要投資此標的，期望報酬為負';
+            } else if (adjustedKelly < 0.05) {
+                kellyAdvice = '⚠️ 建議：投資價值極低，建議尋找更好的機會';
+            } else if (adjustedKelly < 0.15) {
+                kellyAdvice = '建議：可小額試單，實際投資金額建議不超過總資金的 3-7%';
+            } else if (adjustedKelly < 0.25) {
+                kellyAdvice = '建議：適度投資，實際投資金額建議約總資金的 6-12%';
+            } else if (adjustedKelly < 0.50) {
+                kellyAdvice = '建議：較佳投資機會，實際投資金額建議約總資金的 10-20%';
+            } else if (adjustedKelly < 0.75) {
+                kellyAdvice = '建議：優質投資機會，實際投資金額建議約總資金的 15-30%（但請注意風險）';
+            } else {
+                kellyAdvice = '建議：極佳投資機會，但實際投資仍建議不超過總資金的 30-40% 以分散風險';
+            }
+            
+            // 加入勝率來源說明
+            const winRateSource = userProvidedWinRate !== null ? 
+                '（使用您輸入的預期勝率）' : 
+                '（⚠️ 基於技術指標推估，非實際回測結果，僅供參考）';
+
+            document.getElementById('adjustedWinRate').textContent = `${(adjustedP * 100).toFixed(2)}% ${winRateSource}`;
+            
+            // 賠率建議
+            let oddsAdvice = '';
+            if (b < 1) {
+                oddsAdvice = '❌ 風險報酬比不佳，盈利目標低於止損幅度，建議調整參數';
+            } else if (b < 1.5) {
+                oddsAdvice = '⚠️ 風險報酬比偏低，建議提高盈利目標或降低止損幅度';
+            } else if (b < 2) {
+                oddsAdvice = '✓ 風險報酬比合理，符合一般交易標準';
+            } else if (b < 3) {
+                oddsAdvice = '✓✓ 風險報酬比良好，每承擔1元風險可期望獲得2-3元回報';
+            } else {
+                oddsAdvice = '✓✓✓ 風險報酬比優異，每承擔1元風險可期望獲得3元以上回報';
+            }
+            
+            document.getElementById('adjustedOdds').textContent = `${b.toFixed(2)} （扣除交易成本和滑點後的實際賠率）- ${oddsAdvice}`;
+            
+            // 凱利比例警告
+            let kellyDisplay = `${(adjustedKelly * 100).toFixed(2)}%<br><small>計算式：${kellyFormula}</small><br><strong>${kellyAdvice}</strong>`;
+            
+            if (adjustedKelly <= 0) {
+                kellyDisplay = `<span class="warning">${(adjustedKelly * 100).toFixed(2)}%</span><br><small>${kellyFormula}</small><br><strong>${kellyAdvice}</strong>`;
+            } else if (adjustedKelly < 0.05) {
+                kellyDisplay = `<span class="warning">${(adjustedKelly * 100).toFixed(2)}%</span><br><small>${kellyFormula}</small><br><strong>${kellyAdvice}</strong>`;
+            }
+            
+            if (userProvidedWinRate === null) {
+                kellyDisplay += '<br><br><span class="warning">⚠️ 重要提醒：由於勝率是基於技術指標推估而非實際回測，凱利比例僅供參考。實際投資前請務必根據您的交易歷史調整預期勝率。</span>';
+            }
+            
+            document.getElementById('kellyRatio').innerHTML = kellyDisplay;
+            
+            // 波動率建議
+            let dailyVolAdvice = '';
+            if (dailyVolatility < 1) {
+                dailyVolAdvice = '波動極低，適合保守型投資者，但獲利空間有限';
+            } else if (dailyVolatility < 2) {
+                dailyVolAdvice = '波動較低，風險相對可控，適合穩健型投資';
+            } else if (dailyVolatility < 3) {
+                dailyVolAdvice = '波動適中，風險與機會並存，適合一般投資者';
+            } else if (dailyVolatility < 5) {
+                dailyVolAdvice = '波動較高，需要較強的風險承受能力';
+            } else {
+                dailyVolAdvice = '波動極高，高風險高回報，僅適合積極型投資者';
+            }
+
+            let annualVolAdvice = '';
+            if (annualVolatility < 15) {
+                annualVolAdvice = '年化波動率低，類似債券或績優股，適合長期持有';
+            } else if (annualVolatility < 25) {
+                annualVolAdvice = '年化波動率適中，類似大盤指數，適合一般投資';
+            } else if (annualVolatility < 40) {
+                annualVolAdvice = '年化波動率偏高，需要密切關注市場變化';
+            } else if (annualVolatility < 60) {
+                annualVolAdvice = '年化波動率很高，建議設定較寬的止損空間';
+            } else {
+                annualVolAdvice = '年化波動率極高，屬於高風險投機標的，請謹慎操作';
+            }
+            
+            document.getElementById('dailyVolatility').textContent = `${dailyVolatility.toFixed(2)}% - ${dailyVolAdvice}`;
+            document.getElementById('weeklyVolatility').textContent = `${weeklyVolatility.toFixed(2)}% （由日波動率×√5計算）- 用於周線交易者參考`;
+            document.getElementById('monthlyVolatility').textContent = `${monthlyVolatility.toFixed(2)}% （由日波動率×√21計算）- 用於月線交易者參考`;
+            document.getElementById('annualVolatility').textContent = `${annualVolatility.toFixed(2)}% （由日波動率×√252計算）- ${annualVolAdvice}`;
+
+            // 特殊警告
+            if (currentPrice >= historicalHigh * 0.98) {
+                alert('⚠️ 當前價格接近歷史高位，建議等待回調！');
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.add('show');
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // 頁面載入時自動載入股票列表
+        window.addEventListener('DOMContentLoaded', loadStockList);
+    </script>
+</body>
+</html>
