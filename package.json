@@ -1,45 +1,7 @@
 {
   "name": "stock-ai",
   "version": "1.0.0",
-  "description": "HTML 转 Windows 安装包",
-  "main": "main.js",
-  "author": "Joseph PAI",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder"
-  },
-  "build": {
-    "appId": "com.pai11joseph.twstock",
-    "productName": "台灣股票AI助理",
-    "directories": {
-      "output": "dist"
-    },
-    "publish": null,
-    "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "perMachine": false
-    }
-  },
-  "devDependencies": {
-    "electron": "^32.0.0",
-    "electron-builder": "^25.0.0"
-  }
-}
-{
-  "name": "stock-ai",
-  "version": "1.0.0",
-  "description": "HTML 转 Windows 安装包",
+  "description": "台灣股票AI計算器 - HTML 轉桌面應用",
   "main": "main.js",
   "author": "Joseph PAI",
   "scripts": {
@@ -54,7 +16,8 @@
     },
     "publish": null,
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "icon.ico"
     },
     "mac": {
       "target": [
@@ -62,7 +25,8 @@
           "target": "dmg",
           "arch": ["universal"]
         }
-      ]
+      ],
+      "icon": "icon.icns"
     },
     "nsis": {
       "oneClick": false,
