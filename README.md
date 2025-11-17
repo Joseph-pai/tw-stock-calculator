@@ -1,5 +1,4 @@
-# tw-stock-calculator
-# tw-stock-calculator# 台灣股票計算器 - 產品使用說明
+台灣股票計算器 - 產品使用說明
 
 ## 📱 產品簡介
 
